@@ -48,6 +48,7 @@
                                             @csrf
                     
                                             <div class="form-horizontal">
+                                                    @include('partials.messages')
                                                 <fieldset class="form-group position-relative has-icon-left">
                                                     <input id="email" type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email') }}" required autocomplete="email" autofocus>
                     
