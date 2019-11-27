@@ -48,8 +48,9 @@
                                             @csrf
                     
                                             <div class="form-horizontal">
+                                                    @include('partials.messages')
+
                                                 <fieldset class="form-group position-relative has-icon-left">
-                                                        @include('partials.messages')
                                                         <input id="name" type="text" class="form-control @error('name') is-invalid @enderror" name="name" value="{{ old('name') }}" placeholder="{{ __('Name') }}" required autocomplete="name" autofocus>
                         
                                                         @error('name')
