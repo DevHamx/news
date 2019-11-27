@@ -76,6 +76,8 @@
                                                 </button>
                                             </div>
                                         </form>
+                                        <p class="card-subtitle line-on-side text-muted text-center font-small-3 mx-2 my-2"><span>New to this website ?</span></p>
+                                        <a href="{{ route('register') }}" class="btn btn-outline-danger btn-block"><i class="ft-user"></i> {{ __('Register') }}</a>
                                     </div>
                                 </div>
                             </div>

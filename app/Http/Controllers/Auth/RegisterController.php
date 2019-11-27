@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Auth;
-
+use App\User;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 
@@ -10,7 +10,7 @@ class RegisterController extends Controller
 
     public function __construct()
     {
-        $this->middleware('guest');
+        $this->middleware('notLogin');
     }
     /**
      * Show the application registration form.
@@ -36,7 +36,7 @@ class RegisterController extends Controller
         ]);
         $options = [
             'trace' => true,
-            'cache_wsdl' => WSDL_CACHE_NONE
+            'cache_wsdl' => WSDL_CACHE_MEMORY
         ];
         $WSDL= 'http://localhost:8080/News/UserWs?WSDL';
         $client = new \SoapClient($WSDL, $options); // null for non-wsdl mode
@@ -46,27 +46,19 @@ class RegisterController extends Controller
             'email' => $request->input('email'),
             'password' => $request->input('password'),
         ];
-        
-        $result = json_decode($client->SignUp($params)->return);
         // 'GetResult' being the name of the soap method
-          var_dump($result->key);
-            exit;
-    }
+        $result = json_decode($client->SignUp($params)->return);
+          if (isset( $result->error )) {
+            return \redirect('/register')->with('error',$result->error);
+          } else {
+              $user = new User();
+              $user->name = $result->name;
+              $user->email = $result->email;
+              $user->password = $result->password;
+              session(['key' => $result->key]);
+              session(['user' => $user]);
+              return \redirect('/');
 
-    /**
-     * Get the guard to be used during registration.
-     *
-     * @return \Illuminate\Contracts\Auth\StatefulGuard
-     */
-    protected function guard()
-    {
-        return Auth::guard();
+          }          
     }
-
-    /**
-     * Where to redirect users after registration.
-     *
-     * @var string
-     */
-    protected $redirectTo = '/home';
 }
