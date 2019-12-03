@@ -13,9 +13,11 @@
 
 Auth::routes();
 
-Route::get('/', 'HomeController@index')->name('home');
+Route::get('/', 'NewsController@index')->name('home');
+Route::post('addComents', 'NewsController@addComents')->name('addComents');
+Route::get('/profil/{userEmail}', 'NewsController@userProfile')->name('userProfile');
+Route::get('/create', 'NewsController@create')->name('create');
+Route::post('/create', 'NewsController@store')->name('store');
+Route::post('rateNews', 'NewsController@rateNews')->name('rateNews');
 
-Auth::routes();
-Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
