@@ -32,11 +32,21 @@
                                 <?php
                                     $totalLikes=0;$totalDislike=0;
                                     foreach($info->rating as $userEmail => $score){
+                                        if ($userEmail == session('user')->email) {
+                                                ?>
+                                                <input value="{{$score}}" type="hidden" id="ratingstatus{{$i}}">
+                                                <?php
+                                            }
+                                        else{
+                                            ?>
+                                            <input value="0" type="hidden" id="ratingstatus{{$i}}">
+                                            <?php
+                                        }
                                         if ($score==1) {
                                             $totalLikes++;
                                         } else {
                                             $totalDislike--;
-                                        }
+                                        }    
                                     }
                                     $totalDislike*=-1;
                                 ?>
@@ -83,6 +93,32 @@
                 alert("nice move noob :)");
             }
             else{
+                var ratingstatus = $('#ratingstatus'+newsId);
+                    if (ratingstatus.val()==0) {
+                        if (type==1) {
+                        var totalLikes = parseInt($('#totalLikes'+newsId).text())+1;
+                        $('#totalLikes'+newsId).text(" "+totalLikes);
+                        ratingstatus.val(1);
+                        } else {
+                            var totalDisLikes = parseInt($('#totalDisLikes'+newsId).text())+1;
+                        $('#totalDisLikes'+newsId).text(" "+totalDisLikes);
+                        ratingstatus.val(-1);
+                        }
+                    }
+                    else{
+                        var totalLikes = parseInt($('#totalLikes'+newsId).text());
+                        var totalDisLikes = parseInt($('#totalDisLikes'+newsId).text());
+                        if (type==1&&ratingstatus.val()==-1) {
+                        $('#totalLikes'+newsId).text(" "+(totalLikes+1));
+                        $('#totalDisLikes'+newsId).text(" "+(totalDisLikes-1));
+                        ratingstatus.val(1);
+                        } else if(type==-1&&ratingstatus.val()==1){
+                        $('#totalDisLikes'+newsId).text(" "+(totalDisLikes+1));
+                        $('#totalLikes'+newsId).text(" "+(totalLikes-1));
+                        ratingstatus.val(-1);
+                        }
+                    }
+                
                 $.ajax({
                 url: "/rateNews",
                 method: "POST",
@@ -93,16 +129,6 @@
                     rating:type
 
                 },
-                success: function(data){
-                    if (type==1) {
-                        var totalLikes = parseInt($('#totalLikes'+newsId).text())+1;
-                        $('#totalLikes'+newsId).text(" "+totalLikes);
-                    } else {
-                        var totalDisLikes = parseInt($('#totalDisLikes'+newsId).text())+1;
-                    $('#totalDisLikes'+newsId).text(" "+totalDisLikes);
-                    }
-                    
-                }
                 });
             }
         }

@@ -2,7 +2,12 @@
 @section('content')
 @include('partials.messages')
 <section id="user-feed">
-        <a style="margin-bottom: 1.5em" href="/create" class="btn btn-success">create News</a><br>
+        <div class="row">
+            <a style="margin-bottom: 1.5em" href="/create" class="btn btn-success">create News</a><br>
+            @if ($userEmail!=session('user')->email)
+            <a id="addfirend" onclick="addFriend('{{$userEmail}}');" href="#addFriend" style="margin-left: 1.5em;margin-bottom: 1.5em" class="btn btn-info">add Friend</a><br>
+            @endif
+        </div>
     <div class="row">
             <?php $n=0;
             for ($i=0 ;$i < sizeof($newsList) ; $i++) {
@@ -31,7 +36,17 @@
                             <ul class="list-inline">
                                 <?php
                                     $totalLikes=0;$totalDislike=0;
-                                    foreach($info->rating as $userEmail => $score){
+                                    foreach($info->rating as $ratingUserEmail => $score){
+                                        if ($ratingUserEmail == session('user')->email) {
+                                                ?>
+                                                <input value="{{$score}}" type="hidden" id="ratingstatus{{$i}}">
+                                                <?php
+                                            }
+                                        else{
+                                            ?>
+                                            <input value="0" type="hidden" id="ratingstatus{{$i}}">
+                                            <?php
+                                        }
                                         if ($score==1) {
                                             $totalLikes++;
                                         } else {
@@ -83,6 +98,31 @@
                 alert("nice move noob :)");
             }
             else{
+                var ratingstatus = $('#ratingstatus'+newsId);
+                    if (ratingstatus.val()==0) {
+                        if (type==1) {
+                        var totalLikes = parseInt($('#totalLikes'+newsId).text())+1;
+                        $('#totalLikes'+newsId).text(" "+totalLikes);
+                        ratingstatus.val(1);
+                        } else {
+                            var totalDisLikes = parseInt($('#totalDisLikes'+newsId).text())+1;
+                        $('#totalDisLikes'+newsId).text(" "+totalDisLikes);
+                        ratingstatus.val(-1);
+                        }
+                    }
+                    else{
+                        var totalLikes = parseInt($('#totalLikes'+newsId).text());
+                        var totalDisLikes = parseInt($('#totalDisLikes'+newsId).text());
+                        if (type==1&&ratingstatus.val()==-1) {
+                        $('#totalLikes'+newsId).text(" "+(totalLikes+1));
+                        $('#totalDisLikes'+newsId).text(" "+(totalDisLikes-1));
+                        ratingstatus.val(1);
+                        } else if(type==-1&&ratingstatus.val()==1){
+                        $('#totalDisLikes'+newsId).text(" "+(totalDisLikes+1));
+                        $('#totalLikes'+newsId).text(" "+(totalLikes-1));
+                        ratingstatus.val(-1);
+                        }
+                    }
                 $.ajax({
                 url: "/rateNews",
                 method: "POST",
@@ -132,6 +172,19 @@
                 success: function(data){
                 var comments = parseInt($('#totalComment'+newsId).text())+1;
                 $('#totalComment'+newsId).text(" "+comments);
+                }
+                });
+        }
+
+        function addFriend(friendEmail) {
+            $.ajax({
+                url: "/addFriend",
+                method: "POST",
+                data:{
+                    friendEmail:friendEmail,
+                },
+                success: function(data){
+                    $('#addfirend').hide();
                 }
                 });
         }

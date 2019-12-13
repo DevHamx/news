@@ -47,7 +47,7 @@ $this->client->addComment($params);
             // Your parameters
             'userEmail' => $userEmail
         ];
-
+        
         // 'GetResult' being the name of the soap method
         $result = json_decode($this->client->getUserNewsSortedFromNewOnes($params)->return);
         return \view('profil')->with([

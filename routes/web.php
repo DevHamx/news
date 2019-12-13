@@ -19,5 +19,6 @@ Route::get('/profil/{userEmail}', 'NewsController@userProfile')->name('userProfi
 Route::get('/create', 'NewsController@create')->name('create');
 Route::post('/create', 'NewsController@store')->name('store');
 Route::post('rateNews', 'NewsController@rateNews')->name('rateNews');
+Route::post('/addFriend', 'UserController@addFriend')->name('addFriend');
 
 
