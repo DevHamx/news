@@ -35,28 +35,44 @@
                             <p class="card-text">{!!$info->titre!!}</p>
                             <ul class="list-inline">
                                 <?php
-                                    $totalLikes=0;$totalDislike=0;
-                                    foreach($info->rating as $ratingUserEmail => $score){
-                                        if ($ratingUserEmail == session('user')->email) {
-                                                ?>
-                                                <input value="{{$score}}" type="hidden" id="ratingstatus{{$i}}">
-                                                <?php
+                                $totalLikes=0;$totalDislike=0;$rated=0;
+                                foreach($info->rating as $ratingUserEmail => $score){
+                                    if ($ratingUserEmail == session('user')->email) {
+                                            if ($score==1) {
+                                                $rated=1;
                                             }
-                                        else{
-                                            ?>
-                                            <input value="0" type="hidden" id="ratingstatus{{$i}}">
-                                            <?php
+                                            else{
+                                                $rated=-1;
+                                            }
                                         }
-                                        if ($score==1) {
-                                            $totalLikes++;
-                                        } else {
-                                            $totalDislike--;
-                                        }
-                                    }
-                                    $totalDislike*=-1;
+                                    if ($score==1) {
+                                        $totalLikes++;
+                                    } else {
+                                        $totalDislike--;
+                                    }    
+                                }
+                                $totalDislike*=-1;
+                                
+                                if ($rated==1) {
+                                    ?>
+                                    <li class="pr-1"><a onclick="rating(1,{{$i}})" href="#like1"><span id="totalLikes{{$i}}" class="la icon-like"> {{$totalLikes}}</span></a></li>
+                                    <li class="pr-1"><a onclick="rating(-1,{{$i}})" href="#dislike"><span class="la la-thumbs-o-down" id="totalDisLikes{{$i}}">  {{$totalDislike}}</span></a></li>
+                                    <?php
+                                }
+                                else if($rated==-1){
+                                    ?>
+                                    <li class="pr-1"><a onclick="rating(1,{{$i}})" href="#like2"><span id="totalLikes{{$i}}" class="la la-thumbs-o-up"> {{$totalLikes}}</span></a></li>
+                                    <li class="pr-1"><a onclick="rating(-1,{{$i}})" href="#dislike"><span class="la icon-dislike" id="totalDisLikes{{$i}}">  {{$totalDislike}}</span></a></li>
+                                    <?php
+                                }
+                                else{
+                                    ?>
+                                    <li class="pr-1"><a onclick="rating(1,{{$i}})" href="#like2"><span id="totalLikes{{$i}}" class="la la-thumbs-o-up"> {{$totalLikes}}</span></a></li>
+                                    <li class="pr-1"><a onclick="rating(-1,{{$i}})" href="#dislike"><span class="la la-thumbs-o-down" id="totalDisLikes{{$i}}">  {{$totalDislike}}</span></a></li>
+                                    <?php
+                                }
                                 ?>
-                                <li class="pr-1"><a onclick="rating(1,{{$i}})" href="#like"><span id="totalLikes{{$i}}" class="la la-thumbs-o-up"> {{$totalLikes}}</span></a></li>
-                                <li class="pr-1"><a onclick="rating(-1,{{$i}})" href="#dislike"><span class="la la-thumbs-o-down" id="totalDisLikes{{$i}}">  {{$totalDislike}}</span></a></li>
+                                <input value="{{$rated}}" type="hidden" id="ratingstatus{{$i}}">
                                 <li data-toggle="collapse" data-target="#commentsDiv{{$i}}" class="pr-1"><a href="#comment" class=""><span id="totalComment{{$i}}" class="la la-commenting-o"> {{sizeof($comments)}}</span></a></li>
                             </ul>
                         </div>
@@ -99,28 +115,32 @@
             }
             else{
                 var ratingstatus = $('#ratingstatus'+newsId);
+                var totalLikes = $('#totalLikes'+newsId);
+                var totalDisLikes = $('#totalDisLikes'+newsId);
                     if (ratingstatus.val()==0) {
                         if (type==1) {
-                        var totalLikes = parseInt($('#totalLikes'+newsId).text())+1;
-                        $('#totalLikes'+newsId).text(" "+totalLikes);
+                        $('#totalLikes'+newsId).text(" "+(parseInt(totalLikes.text())+1));
                         ratingstatus.val(1);
+                        totalLikes.removeClass('la-thumbs-o-up').addClass('icon-like');
                         } else {
-                            var totalDisLikes = parseInt($('#totalDisLikes'+newsId).text())+1;
-                        $('#totalDisLikes'+newsId).text(" "+totalDisLikes);
+                        $('#totalDisLikes'+newsId).text(" "+(parseInt(totalDisLikes.text())+1));
                         ratingstatus.val(-1);
+                        totalDisLikes.removeClass('la-thumbs-o-down').addClass('icon-dislike');
                         }
                     }
                     else{
-                        var totalLikes = parseInt($('#totalLikes'+newsId).text());
-                        var totalDisLikes = parseInt($('#totalDisLikes'+newsId).text());
                         if (type==1&&ratingstatus.val()==-1) {
-                        $('#totalLikes'+newsId).text(" "+(totalLikes+1));
-                        $('#totalDisLikes'+newsId).text(" "+(totalDisLikes-1));
+                        $('#totalLikes'+newsId).text(" "+(parseInt(totalLikes.text())+1));
+                        $('#totalDisLikes'+newsId).text(" "+(parseInt(totalDisLikes.text())-1));
                         ratingstatus.val(1);
+                        totalLikes.removeClass('la-thumbs-o-up').addClass('icon-like');
+                        totalDisLikes.removeClass('icon-dislike').addClass('la-thumbs-o-down');
                         } else if(type==-1&&ratingstatus.val()==1){
-                        $('#totalDisLikes'+newsId).text(" "+(totalDisLikes+1));
-                        $('#totalLikes'+newsId).text(" "+(totalLikes-1));
+                        $('#totalDisLikes'+newsId).text(" "+(parseInt(totalDisLikes.text())+1));
+                        $('#totalLikes'+newsId).text(" "+(parseInt(totalLikes.text())-1));
                         ratingstatus.val(-1);
+                        totalDisLikes.removeClass('la-thumbs-o-down').addClass('icon-dislike');
+                        totalLikes.removeClass('icon-like').addClass('la-thumbs-o-up');
                         }
                     }
                 $.ajax({
@@ -133,16 +153,6 @@
                     rating:type
 
                 },
-                success: function(data){
-                    if (type==1) {
-                        var totalLikes = parseInt($('#totalLikes'+newsId).text())+1;
-                        $('#totalLikes'+newsId).text(" "+totalLikes);
-                    } else {
-                        var totalDisLikes = parseInt($('#totalDisLikes'+newsId).text())+1;
-                    $('#totalDisLikes'+newsId).text(" "+totalDisLikes);
-                    }
-                    
-                }
                 });
             }
         }
