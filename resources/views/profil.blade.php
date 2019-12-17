@@ -171,7 +171,6 @@
                 +'</div> '
                 +'</div>';
                 commentDivParent.prepend(newCommentDiv);
-                newComment.val("");
             $.ajax({
                 url: "/addComents",
                 method: "POST",
@@ -180,6 +179,7 @@
                     comment:newComment.val(),
                 },
                 success: function(data){
+                newComment.val("");
                 var comments = parseInt($('#totalComment'+newsId).text())+1;
                 $('#totalComment'+newsId).text(" "+comments);
                 }

@@ -39,7 +39,7 @@
                             <div class="card border-grey border-lighten-3 px-1 py-1 m-0">
                                 <div class="card-header border-0">
                                     <div class="card-title text-center">
-                                        <img style="width: 200px; height: 200px" src="{{asset('storage/logos/logo.jpg')}}" alt="logo">
+                                        <img  src="{{asset('app-assets/images/logo/logo-dark.png')}}" alt="logo">
                                     </div>
                                 </div>
                                 <div class="card-content">
